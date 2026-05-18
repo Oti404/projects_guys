@@ -38,14 +38,16 @@ secrets.yaml
 *.ipynb_checkpoints
 
 # Data (large files — commit only samples or metadata)
-data/raw/
 data/processed/
-*.csv
-*.json
 *.parquet
 *.pkl
 *.pickle
-!data/.gitkeep
+*.pdf
+
+# Ignora tot din raw/ cu exceptia CSV-urilor
+data/raw/*
+!data/raw/*.csv
+!data/raw/.gitkeep
 
 # Models
 models/
