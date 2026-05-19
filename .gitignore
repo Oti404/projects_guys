@@ -49,6 +49,11 @@ data/raw/*
 !data/raw/*.csv
 !data/raw/.gitkeep
 
+# Images
+*.png
+*.jpg
+*.jpeg
+
 # Models
 models/
 *.pt
