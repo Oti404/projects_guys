@@ -4,7 +4,7 @@ from ai_module.pipeline import process_candidate_match
 
 sample_jd = """
 We are looking for a Software Engineer with 3 years of experience.
-Must know Python, FastAPI, and Docker. 
+Must know Java, FastAPI, and Docker. 
 A degree from a University is required.
 """
 

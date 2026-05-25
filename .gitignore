@@ -47,6 +47,7 @@ data/processed/
 # Ignora tot din raw/ cu exceptia CSV-urilor
 data/raw/*
 !data/raw/*.csv
+!data/raw/*.pdf
 !data/raw/.gitkeep
 
 # Images
