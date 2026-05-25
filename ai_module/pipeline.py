@@ -2,6 +2,7 @@ import json
 from ai_module.parser import parse_cv
 from ai_module.ner import extract_entities
 from ai_module.embeddings import generate_embeddings
+from ai_module.matcher import calculate_final_score, calculate_skills_similarity
 
 def process_candidate_match(cv_file_path: str, jd_text: str) -> dict:
     """
@@ -42,8 +43,17 @@ def process_candidate_match(cv_file_path: str, jd_text: str) -> dict:
             "education_required": jd_entities.get("education")
         }
     }
+
+    cv_vec = final_output["cv"]["skills_vector"]
+    jd_vec = final_output["jd"]["skills_vector"]
+
+    # Cosine similarity for skills
+    similarity = calculate_skills_similarity(cv_vec, jd_vec)
     
-    return final_output
+    # Final scoring with custom weights
+    result_matching = calculate_final_score(similarity, final_output["cv"], final_output["jd"])
+    
+    return result_matching
 
 
 
