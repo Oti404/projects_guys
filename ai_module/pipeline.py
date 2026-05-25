@@ -1,14 +1,14 @@
 import json
-from ai_module.parser import parse_cv
-from ai_module.ner import extract_entities
-from ai_module.embeddings import generate_embeddings
-from ai_module.matcher import calculate_final_score, calculate_skills_similarity
+from parser import parse_cv
+from ner import extract_entities
+from embeddings import generate_embeddings
+from agent import get_ai_agent_evaluation
 
 def process_candidate_match(cv_file_path: str, jd_text: str) -> dict:
     """
-    Acts as the main pipeline for Phase 1.
+    Acts as the main pipeline for Phase 1 and Phase 2.
     Reads the CV, processes both the CV and Job Description (JD),
-    generates skill embeddings, and outputs the final dictionary.
+    generates skill embeddings, computes math scores, and runs the AI Agent.
     """
     
     # Parse the CV file (PDF or DOCX) to get raw text
@@ -39,33 +39,25 @@ def process_candidate_match(cv_file_path: str, jd_text: str) -> dict:
         "jd": {
             "skills_required": jd_skills,
             "skills_vector": jd_vector,
-            "minimum_experience": jd_entities.get("years_of_experience"), # Extracted from JD
+            "minimum_experience": jd_entities.get("years_of_experience"), 
             "education_required": jd_entities.get("education")
         }
     }
 
-    cv_vec = final_output["cv"]["skills_vector"]
-    jd_vec = final_output["jd"]["skills_vector"]
-
-    # Cosine similarity for skills
-    similarity = calculate_skills_similarity(cv_vec, jd_vec)
-    
-    # Final scoring with custom weights
-    result_matching = calculate_final_score(similarity, final_output["cv"], final_output["jd"])
+    # AI Agent evaluation based on the extracted data and computed similarity
+    result_matching = get_ai_agent_evaluation(final_output)
     
     return result_matching
-
-
-
 
 
 if __name__ == "__main__":
     # Fake JD text for testing
     sample_jd = """
     We are looking for a Software Engineer with 3 years of experience.
-    Must know Python, FastAPI, and Docker. 
+    Must know Java, FastAPI, and Docker. 
     A degree from a University is required.
     """
     
+    # Since you are running this file directly, use the relative path from project root
     result = process_candidate_match("data/raw/sample_cv.pdf", sample_jd)
     print(json.dumps(result, indent=2))
