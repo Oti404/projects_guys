@@ -64,28 +64,3 @@ def calculate_final_score(
         "missing_skills": [s.capitalize() for s in missing_skills],
         "bonus_skills": [s.capitalize() for s in bonus_skills],
     }
-
-if __name__ == "__main__":
-    from pipeline import process_candidate_match
-    import json
-    import os  
-
-    sample_jd = """
-    We are looking for a Software Engineer with 3 years of experience.
-    Must know Java, FastAPI, and Docker. 
-    A degree from a University is required.
-    """
-
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    pdf_absolute_path = os.path.join(base_dir, "data", "raw", "sample_cv.pdf")
-   
-    print(f"Running Stage 1 pipeline using path: {pdf_absolute_path}")
-    final_result = process_candidate_match(pdf_absolute_path, sample_jd)
-
-    if "error" in final_result:
-        print("\n ERROR IN PIPELINE:")
-        print(final_result["error"])
-    else:
-        print("\n Pipeline executed successfully!")
-        print("\n=== FINAL MATCHING RESULT ===")
-        print(json.dumps(final_result, indent=2))
