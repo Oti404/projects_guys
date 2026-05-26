@@ -3,20 +3,23 @@ import json
 from dotenv import load_dotenv
 from openai import AzureOpenAI
 
-from matcher import (
+from ai_module.matcher import (
     calculate_skills_similarity,
     calculate_final_score
 )
 
-# Load environment variables
-load_dotenv()
+_client = None
 
-# Azure OpenAI client
-client = AzureOpenAI(
-    api_key=os.getenv("AZURE_OPENAI_API_KEY"),
-    api_version="2024-08-01-preview",
-    azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT")
-)
+def _get_client() -> AzureOpenAI:
+    global _client
+    if _client is None:
+        load_dotenv()
+        _client = AzureOpenAI(
+            api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+            api_version="2024-08-01-preview",
+            azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+        )
+    return _client
 SYSTEM_PROMPT = """
 You are a Senior Technical Recruiter and Talent Assessment Specialist.
 
@@ -151,7 +154,7 @@ def get_ai_agent_evaluation(stage1_output: dict) -> dict:
     """
 
     try:
-        response = client.chat.completions.create(
+        response = _get_client().chat.completions.create(
             model=os.getenv(
                 "AZURE_OPENAI_DEPLOYMENT_NAME",
                 "gpt-4o-mini"

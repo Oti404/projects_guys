@@ -13,7 +13,7 @@ def calculate_skills_similarity(cv_vector, jd_vector):
 
     # Calculate cosine similarity 
     similarity = cosine_similarity(vec_cv, vec_jd)[0][0]
-    return float(similarity)
+    return float(max(0.0, similarity))
 
 
 def calculate_final_score(

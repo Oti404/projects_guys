@@ -1,0 +1,240 @@
+<div class="container">
+  <header>
+    <h1>HR Assistant</h1>
+    <p class="subtitle">Analiza automata CV &ndash; Job Description cu AI</p>
+  </header>
+
+  <!-- Form -->
+  <section class="card input-card">
+    <div class="input-card-header">
+      <span class="input-card-title">Candidat nou</span>
+      @if (cvFile || result()) {
+        <button class="btn-reset" (click)="resetForm()">+ CV Nou</button>
+      }
+    </div>
+
+    <div class="form-group">
+      <label>CV Candidat <span class="required">*</span></label>
+      <div class="file-drop" [class.has-file]="cvFile">
+        <input #fileInput type="file" accept=".pdf,.docx" (change)="onFileSelected($event)" id="cv-input" />
+        <label for="cv-input" class="file-label">
+          @if (cvFile) {
+            <span class="file-name">{{ cvFile.name }}</span>
+          } @else {
+            <span>Selecteaza fisier PDF sau DOCX</span>
+          }
+        </label>
+      </div>
+      @if (previewType()) {
+        <button class="btn-preview" (click)="openPreview()">Vizualizeaza CV</button>
+      }
+    </div>
+
+    <div class="form-group">
+      <label for="jd-input">Job Description <span class="required">*</span></label>
+
+      @if (jdCategories().length > 0) {
+        <div class="jd-import-row">
+          <select
+            class="jd-select"
+            [ngModel]="selectedJdCategory()"
+            (ngModelChange)="onJdCategoryChange($event)"
+          >
+            <option value="">— Scrie manual —</option>
+            @for (cat of jdCategories(); track cat) {
+              <option [value]="cat">{{ cat }}</option>
+            }
+          </select>
+          @if (jdLoading()) {
+            <span class="jd-loading-spinner"></span>
+          }
+        </div>
+      }
+
+      <textarea
+        id="jd-input"
+        rows="6"
+        placeholder="Ex: Cautam un Backend Engineer cu 3 ani experienta in Python, Docker si REST APIs..."
+        [ngModel]="jobDescription()"
+        (ngModelChange)="jobDescription.set($event)"
+      ></textarea>
+    </div>
+
+    <button class="btn-analyze" (click)="analyze()" [disabled]="!canAnalyze">
+      @if (loading()) {
+        <span class="spinner"></span> Analizez...
+      } @else {
+        Analizeaza
+      }
+    </button>
+  </section>
+
+  <!-- Error -->
+  @if (errorMessage()) {
+    <div class="error-banner">{{ errorMessage() }}</div>
+  }
+
+  <!-- Results -->
+  @if (result(); as r) {
+    <section class="results">
+      @if (activeHistoryId()) {
+        <div class="history-result-label">
+          Vizualizezi un rezultat din istoric
+        </div>
+      }
+
+      <div class="card score-card">
+        <div class="score-header">
+          <span class="score-value" [style.color]="currentScoreColor">{{ r.score }}%</span>
+          <span class="decision-badge" [attr.data-decision]="r.hiring_decision">
+            {{ hiringDecisionLabel }}
+          </span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" [style.width.%]="r.score" [style.background]="currentScoreColor"></div>
+        </div>
+      </div>
+
+      <div class="skills-grid">
+        <div class="card skills-card">
+          <h3>Skills Potrivite</h3>
+          @if (r.matched_skills.length) {
+            <div class="chips">
+              @for (skill of r.matched_skills; track skill) {
+                <span class="chip chip-green">{{ skill }}</span>
+              }
+            </div>
+          } @else {
+            <p class="empty">Niciun skill potrivit detectat.</p>
+          }
+        </div>
+        <div class="card skills-card">
+          <h3>Skills Lipsa</h3>
+          @if (r.missing_skills.length) {
+            <div class="chips">
+              @for (skill of r.missing_skills; track skill) {
+                <span class="chip chip-red">{{ skill }}</span>
+              }
+            </div>
+          } @else {
+            <p class="empty">Niciun skill lipsa.</p>
+          }
+        </div>
+        <div class="card skills-card">
+          <h3>Skills Bonus</h3>
+          @if (r.bonus_skills.length) {
+            <div class="chips">
+              @for (skill of r.bonus_skills; track skill) {
+                <span class="chip chip-blue">{{ skill }}</span>
+              }
+            </div>
+          } @else {
+            <p class="empty">Niciun skill bonus.</p>
+          }
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Recomandare Recruiter</h3>
+        <p class="recommendation">{{ r.recommendations }}</p>
+      </div>
+
+      <div class="card">
+        <h3>Intrebari de Interviu</h3>
+        <ol class="interview-list">
+          @for (q of r.interview_questions; track q) {
+            <li>{{ q }}</li>
+          }
+        </ol>
+      </div>
+
+      @if (r.red_flags.length) {
+        <div class="card red-flags-card">
+          <h3>Red Flags</h3>
+          <ul class="flag-list">
+            @for (flag of r.red_flags; track flag) {
+              <li>{{ flag }}</li>
+            }
+          </ul>
+        </div>
+      }
+    </section>
+  }
+
+  <!-- Comparison Panel -->
+  @if (history().length > 0) {
+    <section class="comparison-panel card">
+      <div class="comparison-header">
+        <div>
+          <span class="comparison-title">Comparatie Candidati</span>
+          <span class="comparison-count">{{ history().length }} analizati &bull; sortat dupa scor</span>
+        </div>
+        <button class="btn-clear-history" (click)="clearHistory()">Sterge tot</button>
+      </div>
+
+      <div class="comparison-list">
+        @for (entry of historySortedByScore(); track entry.id; let rank = $index) {
+          <div
+            class="comparison-card"
+            [class.active]="activeHistoryId() === entry.id"
+            (click)="viewHistoryEntry(entry)"
+          >
+            <div class="rank-badge" [attr.data-rank]="rank + 1">#{{ rank + 1 }}</div>
+
+            <div class="comparison-info">
+              <div class="comparison-filename">{{ entry.cvFileName }}</div>
+              <div class="comparison-jd">{{ entry.jdSnippet }}…</div>
+              <div class="comparison-skills">
+                @for (skill of entry.result.matched_skills.slice(0, 4); track skill) {
+                  <span class="chip chip-green chip-sm">{{ skill }}</span>
+                }
+                @if (entry.result.matched_skills.length > 4) {
+                  <span class="chip-more">+{{ entry.result.matched_skills.length - 4 }}</span>
+                }
+              </div>
+            </div>
+
+            <div class="comparison-score-col">
+              <span class="comparison-score" [style.color]="scoreColor(entry.result.score)">
+                {{ entry.result.score }}%
+              </span>
+              <div class="mini-progress-track">
+                <div
+                  class="mini-progress-fill"
+                  [style.width.%]="entry.result.score"
+                  [style.background]="scoreColor(entry.result.score)"
+                ></div>
+              </div>
+              <span class="comparison-decision" [attr.data-decision]="entry.result.hiring_decision">
+                {{ decisionLabel(entry.result.hiring_decision) }}
+              </span>
+              <span class="comparison-date">{{ formatDate(entry.timestamp) }}</span>
+            </div>
+
+            <button class="btn-remove-entry" (click)="removeHistoryEntry(entry.id, $event)" title="Sterge">&#x2715;</button>
+          </div>
+        }
+      </div>
+    </section>
+  }
+</div>
+
+<!-- CV Preview Modal -->
+@if (previewOpen()) {
+  <div class="modal-overlay" (click)="closePreview()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <span class="modal-title">{{ cvFile?.name }}</span>
+        <button class="btn-close" (click)="closePreview()">&#x2715;</button>
+      </div>
+      <div class="modal-body">
+        @if (previewType() === 'pdf') {
+          <iframe [src]="pdfPreviewUrl()" class="modal-pdf-frame"></iframe>
+        }
+        @if (previewType() === 'docx') {
+          <div class="modal-docx" [innerHTML]="docxHtml()"></div>
+        }
+      </div>
+    </div>
+  </div>
+}

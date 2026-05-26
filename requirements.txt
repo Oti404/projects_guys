@@ -1,6 +1,14 @@
 openai>=1.0.0
 python-dotenv
 pytest
+fastapi
+uvicorn[standard]
+python-multipart
+PyPDF2
+python-docx
+spacy
+sentence-transformers
+httpx
 anyio==4.13.0
 argon2-cffi==25.1.0
 argon2-cffi-bindings==25.1.0

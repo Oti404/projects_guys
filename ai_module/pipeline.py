@@ -1,8 +1,18 @@
 import json
-from parser import parse_cv
-from ner import extract_entities
-from embeddings import generate_embeddings
-from agent import get_ai_agent_evaluation
+import re
+from ai_module.parser import parse_cv
+from ai_module.ner import extract_entities
+from ai_module.embeddings import generate_embeddings
+from ai_module.agent import get_ai_agent_evaluation
+
+
+def _clean_text(text: str) -> str:
+    """Fix common PDF parsing artifacts: joined words, excessive whitespace."""
+    # Insert space between lowercase→uppercase transitions (e.g. "withActive" → "with Active")
+    text = re.sub(r'([a-z])([A-Z])', r'\1 \2', text)
+    # Normalize all whitespace (newlines, tabs, multiple spaces) to single space
+    text = re.sub(r'\s+', ' ', text)
+    return text.strip()
 
 def process_candidate_match(cv_file_path: str, jd_text: str) -> dict:
     """
@@ -16,6 +26,9 @@ def process_candidate_match(cv_file_path: str, jd_text: str) -> dict:
     if cv_text.startswith("Error"):
         return {"error": cv_text}
 
+    cv_text = _clean_text(cv_text)
+    jd_text = _clean_text(jd_text)
+
     # Extract entities (skills, education, experience) from both CV and JD
     cv_entities = extract_entities(cv_text)
     jd_entities = extract_entities(jd_text)
@@ -23,11 +36,12 @@ def process_candidate_match(cv_file_path: str, jd_text: str) -> dict:
     cv_skills = cv_entities.get("skills", [])
     jd_skills = jd_entities.get("skills", [])
 
-    cv_skills_text = " ".join(cv_skills)
-    jd_skills_text = " ".join(jd_skills)
+    # Fallback to full text when NER detects no skills, so similarity is never stuck at 0
+    cv_embed_text = " ".join(cv_skills) if cv_skills else cv_text
+    jd_embed_text = " ".join(jd_skills) if jd_skills else jd_text
 
-    cv_vector = generate_embeddings([cv_skills_text])[0].tolist() if cv_skills else []
-    jd_vector = generate_embeddings([jd_skills_text])[0].tolist() if jd_skills else []
+    cv_vector = generate_embeddings([cv_embed_text])[0].tolist()
+    jd_vector = generate_embeddings([jd_embed_text])[0].tolist()
 
     final_output = {
         "cv": {
@@ -39,7 +53,7 @@ def process_candidate_match(cv_file_path: str, jd_text: str) -> dict:
         "jd": {
             "skills_required": jd_skills,
             "skills_vector": jd_vector,
-            "minimum_experience": jd_entities.get("years_of_experience"), 
+            "minimum_experience": jd_entities.get("years_of_experience"),
             "education_required": jd_entities.get("education")
         }
     }

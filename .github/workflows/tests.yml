@@ -1,0 +1,46 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          pip install pytest
+          pip install fastapi "uvicorn[standard]" python-multipart httpx
+          pip install PyPDF2 python-docx
+          pip install python-dotenv "openai>=1.0.0"
+          pip install spacy scikit-learn numpy
+          pip install sentence-transformers
+
+      - name: Download spaCy model
+        run: python -m spacy download en_core_web_sm
+
+      - name: Run tests
+        run: pytest tests/ -v --ignore=tests/test_azure_connection.py
+        env:
+          AZURE_OPENAI_API_KEY: dummy
+          AZURE_OPENAI_ENDPOINT: https://dummy.example.com/
+          AZURE_OPENAI_DEPLOYMENT_NAME: gpt-4o-mini
+          AZURE_OPENAI_API_VERSION: 2024-02-01

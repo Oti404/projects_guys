@@ -6,9 +6,9 @@ load_dotenv()
 
 def test_azure_connection():
     client = AzureOpenAI(
-        api_key=os.getenv("AZURE_FOUNDRY_API_KEY"),
+        api_key=os.getenv("AZURE_OPENAI_API_KEY"),
         api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
-        azure_endpoint=os.getenv("AZURE_FOUNDRY_ENDPOINT"),
+        azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
     )
 
     response = client.chat.completions.create(
