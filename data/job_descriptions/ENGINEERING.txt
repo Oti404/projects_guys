@@ -1,0 +1,10 @@
+We are seeking an Engineering Lab Technician to support our aerospace testing and certification team.
+The ideal candidate has hands-on experience with mechanical test equipment, structural testing,
+and instrument calibration in an aerospace or industrial environment.
+Responsibilities include setting up and executing static and dynamic test procedures,
+capturing and recording data for certification reports, maintaining calibration logs,
+troubleshooting equipment issues, and reading schematics and engineering drawings.
+Familiarity with MATLAB, LabVIEW, and AutoCAD is a plus.
+Knowledge of FAA certification processes or military testing standards is highly valued.
+A degree in Mechanical, Aerospace, or Electrical Engineering is preferred.
+Minimum 3 years of experience in a lab or equipment engineering role.

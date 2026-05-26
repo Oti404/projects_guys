@@ -1,0 +1,11 @@
+We are looking for an Information Technology Systems Administrator to manage our IT infrastructure.
+The ideal candidate has strong hands-on experience with Active Directory, Group Policy Objects,
+Windows Server 2012/2016, VMware vSphere, Microsoft Exchange, and Office 365.
+Responsibilities include managing user accounts, configuring and maintaining servers and networks,
+implementing backup and disaster recovery solutions, troubleshooting hardware and software issues,
+and supporting virtualization infrastructure using VMware or Azure IaaS.
+Experience with PowerShell scripting, TCP/IP, DNS, DHCP, and network security is required.
+Familiarity with SCCM, enterprise backup systems (Veeam, Veritas Netbackup), and VPN is a plus.
+A Bachelor's degree in Information Technology or Computer Science is preferred.
+CompTIA Network+ or Microsoft certifications are highly valued.
+Minimum 4 years of experience in IT systems administration.
