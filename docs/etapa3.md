@@ -11,7 +11,7 @@
 rezultat de la Etapa 2 (JSON complet)
     ↓ FastAPI
 endpoint HTTP /analyze
-    ↓ Streamlit
+    ↓ Angular (frontend)
 interfață vizuală în browser
     ↓ pytest
 teste automate de validare
@@ -50,7 +50,7 @@ De ce e util: UI-ul, un alt sistem extern, sau profesorul pot apela API-ul direc
 
 ---
 
-## Pasul 2 — Streamlit (Dashboard vizual)
+## Pasul 2 — Angular (Frontend / Dashboard vizual)
 
 **Scop:** interfață grafică în browser — utilizatorul uploadează CV și lipește JD, vede rezultatul vizual
 
@@ -72,25 +72,25 @@ De ce e util: UI-ul, un alt sistem extern, sau profesorul pot apela API-ul direc
 │  Scor potrivire:  91.5%                 │
 │  ████████████████████░░░                │
 │                                         │
-│  ✅ Skills potrivite:                   │
+│  Skills potrivite:                      │
 │     Python, REST APIs                   │
 │                                         │
-│  ❌ Skills lipsă:                       │
+│  Skills lipsă:                          │
 │     Kubernetes                          │
 │                                         │
-│  🎁 Skills bonus (neceute):             │
+│  Skills bonus (necerute):               │
 │     Docker                              │
 │                                         │
-│  💬 Întrebări interviu:                 │
+│  Întrebări interviu:                    │
 │  • Descrie o arhitectură REST API...    │
 │  • Ai experiență cu K8s?               │
 │                                         │
-│  ⚠ Red flags:                          │
+│  Red flags:                             │
 │  • Niciun proiect open-source          │
 └─────────────────────────────────────────┘
 ```
 
-**Fișier:** `ui/app.py`
+**Folder:** `ui/` (aplicație Angular — `ng serve` pentru development)
 
 ---
 
@@ -140,5 +140,5 @@ HR-ul vede scorul, skills-urile și recomandările
 |-----------|-----|
 | FastAPI | Framework API HTTP |
 | Uvicorn | Server ASGI pentru FastAPI |
-| Streamlit | Dashboard vizual în browser |
+| Angular | Frontend SPA în browser |
 | pytest | Testare automată |
